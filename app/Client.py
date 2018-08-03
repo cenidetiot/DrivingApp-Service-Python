@@ -29,10 +29,27 @@ class SmartClient (object):
 
     def getDevicesOnZone(self, zone):
         print("http://{}/service/devices/zone/{}".format(config.smart, zone))
-        devicesList = requests.get("http://{}/service/devices/zone/{}".format(config.smart, zone))
+        #devicesList = requests.get("http://{}/service/devices/zone/{}".format(config.smart, zone))
+        #Get all devices  
+        body = {
+            "id" : "Device_Smartphone_.*",
+            "type" : "Device",
+            "options" : "keyValues"
+        }
+        devicesList = requests.post("http://{}/service/query".format(config.smart),data=body)
+
         return devicesList.json()
 
-    def getTokens(self):
-        tokenDevices = requests.get("http://{}/api/device/token".format(config.smart))
-        return tokenDevices.json()
+    def getTokens(self, type = None):
+        tokenDevices = requests.get("http://{}/api/device/token?status=1".format(config.smart)).json()
+        tempTokens = []
+        if type != None:
+            for token in tokenDevices :
+                if token["preferences"] == type:
+                    tempTokens.append(token)
+        else :
+            tempTokens = tokenDevices
+        return tempTokens
     
+    def createSuscription(self):
+        pass
